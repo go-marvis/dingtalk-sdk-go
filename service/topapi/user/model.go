@@ -35,6 +35,9 @@ type GetResp struct {
 }
 
 type GetRespResult struct {
-	UserId string `json:"userid"`
-	Name   string `json:"name"`
+	UserId    string `json:"userid"`     // 员工编号
+	Name      string `json:"name"`       // 员工姓名
+	Title     string `json:"title"`      // 职位
+	Mobile    string `json:"mobile"`     // 手机号码
+	WorkPlace string `json:"work_place"` // 办公地点
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/http"
 	"time"
 )
 
@@ -41,7 +40,6 @@ type GetTokenResp struct {
 func (m *TokenManager) getAppAccessTokenThenCache(ctx context.Context, config *Config) (string, error) {
 	req := NewApiReq()
 	req.AccessTokenType = AccessTokenTypeNone
-	req.HttpMethod = http.MethodGet
 	req.ApiPath = AppAccessTokenUrlPath
 	req.QueryParams.Add("appkey", config.AppKey)
 	req.QueryParams.Add("appsecret", config.AppSecret)

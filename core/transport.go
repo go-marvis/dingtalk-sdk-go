@@ -43,12 +43,18 @@ func Request(ctx context.Context, apiReq *ApiReq, config *Config, options ...Req
 		optf(option)
 	}
 
-	body, err := config.Serializer.Marshal([]any{apiReq.Body})
-	if err != nil {
-		return nil, err
+	var (
+		body []byte
+		err  error
+	)
+	if apiReq.Body == nil {
+		body = []byte{}
+	} else {
+		body, err = config.Serializer.Marshal([]any{apiReq.Body})
+		if err != nil {
+			return nil, err
+		}
 	}
-
-	path := config.BaseUrl + apiReq.ApiPath
 
 	var values = make(url.Values, 0)
 	for key := range apiReq.QueryParams {
@@ -66,9 +72,9 @@ func Request(ctx context.Context, apiReq *ApiReq, config *Config, options ...Req
 		}
 	}
 
-	queryPath := values.Encode()
-	if queryPath != "" {
-		path = fmt.Sprintf("%s?%s", path, queryPath)
+	path := config.BaseUrl + apiReq.ApiPath
+	if query := values.Encode(); query != "" {
+		path = fmt.Sprintf("%s?%s", path, query)
 	}
 
 	if config.Debug {
