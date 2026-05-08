@@ -7,12 +7,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type ReqTranslator struct {
 }
 
-func (translator *ReqTranslator) translate(ctx context.Context, req *ApiReq, accessTokenType AccessTokenType, config *Config, option *ReqOption) (*http.Request, error) {
+func (translator *ReqTranslator) translate(ctx context.Context, req *ApiReq, config *Config, option *ReqOption) (*http.Request, error) {
 
 	body := req.Body
 	contentType, rawBody, err := translator.payload(body, config.Serializer)
@@ -32,7 +33,10 @@ func (translator *ReqTranslator) translate(ctx context.Context, req *ApiReq, acc
 		}
 	}
 
-	newPath := config.BaseUrl + req.ApiPath
+	newPath := req.ApiPath
+	if strings.Index(newPath, "http") != 0 {
+		newPath = fmt.Sprintf("%s%s", config.BaseUrl, newPath)
+	}
 	if query := params.Encode(); query != "" {
 		newPath = fmt.Sprintf("%s?%s", newPath, query)
 	}

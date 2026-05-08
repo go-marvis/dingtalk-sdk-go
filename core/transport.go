@@ -41,7 +41,7 @@ func Request(ctx context.Context, apiReq *ApiReq, config *Config, options ...Req
 		fn(option)
 	}
 
-	httpReq, err := translator.translate(ctx, apiReq, apiReq.AccessTokenType, config, option)
+	httpReq, err := translator.translate(ctx, apiReq, config, option)
 	if err != nil {
 		return nil, err
 	}
