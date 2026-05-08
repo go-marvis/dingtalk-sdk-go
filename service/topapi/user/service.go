@@ -23,11 +23,11 @@ func (s *Service) Get(ctx context.Context, req *GetReq, options ...core.ReqOptio
 	apiReq.ApiPath = "/topapi/v2/user/get"
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
+	resp := &GetResp{ApiResp: apiResp}
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 
-	resp := &GetResp{ApiResp: apiResp}
 	err = apiResp.UnmarshalBody(resp, s.config)
 	return resp, err
 }

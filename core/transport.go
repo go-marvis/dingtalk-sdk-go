@@ -69,11 +69,11 @@ func Request(ctx context.Context, apiReq *ApiReq, config *Config, options ...Req
 		if codeError.ErrCode != 0 {
 			slog.Error("api error", "errcode", codeError.ErrCode, "errmsg", codeError.ErrMsg)
 			err = fmt.Errorf("api error, code=%v, err=%v", codeError.ErrCode, codeError.ErrMsg)
-
-			// TODO retry
+			return apiResp, err
 		}
 
 		err = nil
 	}
-	return apiResp, nil
+
+	return apiResp, err
 }
