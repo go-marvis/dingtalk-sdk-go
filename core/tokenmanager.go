@@ -2,10 +2,17 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
+	"net/http"
 	"time"
 )
+
+type AccessTokenResp struct {
+	*ApiResp `json:"-"`
+	CodeError
+	AccessToken string `json:"accessToken"`
+	ExpiresIn   int    `json:"expireIn"`
+}
 
 var tokenManager = TokenManager{cache: cache}
 
@@ -13,8 +20,7 @@ type TokenManager struct {
 	cache Cache
 }
 
-func (m *TokenManager) getAccessToken(ctx context.Context, config *Config) (string, error) {
-
+func (m *TokenManager) getAppAccessToken(ctx context.Context, config *Config) (string, error) {
 	token, err := m.cache.Get(ctx, appAccessTokenKey(config.AppId))
 	if err != nil {
 		return "", err
@@ -30,26 +36,43 @@ func (m *TokenManager) getAccessToken(ctx context.Context, config *Config) (stri
 	return token, nil
 }
 
-type GetTokenResp struct {
-	*ApiResp `json:"-"`
-	CodeError
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int    `json:"expires_in"`
-}
-
-func (m *TokenManager) getAppAccessTokenThenCache(ctx context.Context, config *Config) (string, error) {
-	req := NewApiReq()
-	req.AccessTokenType = AccessTokenTypeNone
-	req.ApiPath = AppAccessTokenUrlPath
-	req.QueryParams.Add("appkey", config.AppKey)
-	req.QueryParams.Add("appsecret", config.AppSecret)
-
-	rawResp, err := Request(ctx, req, config)
+func (m *TokenManager) getCorpAccessToken(ctx context.Context, config *Config) (string, error) {
+	token, err := m.cache.Get(ctx, corpAccessTokenKey(config.CorpId))
 	if err != nil {
 		return "", err
 	}
 
-	resp := &GetTokenResp{}
+	if token == "" {
+		token, err = m.getCorpAccessTokenThenCache(ctx, config)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return token, nil
+}
+
+type AccessTokenReq struct {
+	AppKey    string `json:"appKey"`
+	AppSecret string `json:"appSecret"`
+}
+
+// getAppAccessTokenThenCache 企业内部应用
+func (m *TokenManager) getAppAccessTokenThenCache(ctx context.Context, config *Config) (string, error) {
+	rawResp, err := Request(ctx, &ApiReq{
+		HttpMethod: http.MethodPost,
+		ApiPath:    AppAccessTokenUrlPath,
+		Body: &AccessTokenReq{
+			AppKey:    config.AppKey,
+			AppSecret: config.AppSecret,
+		},
+		SupportedAccessTokenTypes: []AccessTokenType{AccessTokenTypeNone},
+	}, config)
+	if err != nil {
+		return "", err
+	}
+
+	resp := &AccessTokenResp{}
 	err = rawResp.UnmarshalBody(&resp, config)
 	if err != nil {
 		return "", err
@@ -62,6 +85,37 @@ func (m *TokenManager) getAppAccessTokenThenCache(ctx context.Context, config *C
 
 	return resp.AccessToken, nil
 }
-func appAccessTokenKey(appId string) string {
-	return fmt.Sprintf("%s-%s", appAccessTokenKeyPrefix, appId)
+
+type CorpAccessTokenReq struct {
+	SuiteKey    string `json:"suiteKey"`
+	SuiteSecret string `json:"suiteSecret"`
+	AuthCorpId  string `json:"authCorpId"`
+	SuiteTicket string `json:"suiteTicket"`
+}
+
+func (m *TokenManager) getCorpAccessTokenThenCache(ctx context.Context, config *Config) (string, error) {
+	rawResp, err := Request(ctx, &ApiReq{
+		HttpMethod: http.MethodPost,
+		ApiPath:    CorpAccessTokenUrlPath,
+		Body: &CorpAccessTokenReq{
+			SuiteKey:    config.SuiteKey,
+			SuiteSecret: config.SuiteSecret,
+			AuthCorpId:  config.CorpId,
+			SuiteTicket: config.SuiteTicket,
+		},
+		SupportedAccessTokenTypes: []AccessTokenType{AccessTokenTypeNone},
+	}, config)
+
+	resp := &AccessTokenResp{}
+	err = rawResp.UnmarshalBody(&resp, config)
+	if err != nil {
+		return "", err
+	}
+	expire := time.Duration(resp.ExpiresIn)*time.Second - expiryDelta
+	err = m.cache.Set(ctx, corpAccessTokenKey(config.AppId), resp.AccessToken, expire)
+	if err != nil {
+		slog.Warn("app corpAccessToken save cache", "err", err)
+	}
+
+	return resp.AccessToken, nil
 }

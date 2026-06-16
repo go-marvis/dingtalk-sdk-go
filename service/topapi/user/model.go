@@ -41,3 +41,38 @@ type GetRespResult struct {
 	Mobile    string `json:"mobile"`     // 手机号码
 	WorkPlace string `json:"work_place"` // 办公地点
 }
+
+type CountReqBodyBuilder struct {
+	apiReq *core.ApiReq
+}
+
+func NewCountReqBodyBuilder() *CountReqBodyBuilder {
+	return &CountReqBodyBuilder{core.NewApiReq()}
+}
+
+func (b *CountReqBodyBuilder) Body(body *CountReqBody) *CountReqBodyBuilder {
+	b.apiReq.Body = body
+	return b
+}
+
+func (b *CountReqBodyBuilder) Build() *CountReq {
+	return &CountReq{b.apiReq}
+}
+
+type CountReq struct {
+	apiReq *core.ApiReq
+}
+
+type CountReqBody struct {
+	OnlyActive string `json:"only_active,omitempty"`
+}
+
+type CountResp struct {
+	*core.ApiResp
+	core.CodeError
+	Result *CountRespResult `json:"result"`
+}
+
+type CountRespResult struct {
+	Count int64 `json:"count"`
+}

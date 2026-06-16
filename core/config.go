@@ -9,11 +9,16 @@ import (
 
 type Config struct {
 	BaseUrl string // 服务地址
-	AppId   string
 
-	AppKey    string // 接口账号
-	AppSecret string
-	Debug     bool
+	AppId       string // 第三方个人应用
+	AppKey      string // 企业内部应用
+	AppSecret   string
+	CorpId      string // 第三方应用授权企业
+	SuiteKey    string // 第三方企业应用
+	SuiteSecret string
+	SuiteTicket string
+
+	Debug bool
 
 	Retry   int           // 重试次数
 	Limiter *rate.Limiter // 请求限速
