@@ -15,7 +15,7 @@ type ReqTranslator struct {
 }
 
 func authorizationToRequest(req *ApiReq, option *RequestOption, token string) {
-	if strings.Index(req.ApiPath, OldUrl) == 0 {
+	if strings.Index(req.ApiPath, OapiUrl) == 0 {
 		req.QueryParams.Set("access_token", token)
 	} else {
 		option.Header.Set("x-acs-dingtalk-access-token", token)

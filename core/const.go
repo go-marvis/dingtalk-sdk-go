@@ -10,7 +10,7 @@ const (
 )
 
 const (
-	OldUrl  = "https://oapi.dingtalk.com"
+	OapiUrl = "https://oapi.dingtalk.com"
 	BaseUrl = "https://api.dingtalk.com"
 )
 

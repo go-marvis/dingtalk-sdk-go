@@ -1,4 +1,4 @@
-package user
+package doc
 
 import (
 	"context"
@@ -15,19 +15,19 @@ func NewService(config *core.Config) *Service {
 	return &Service{config}
 }
 
-// 查询用户详情
-// https://open.dingtalk.com/document/development/query-user-details
-func (s *Service) Get(ctx context.Context, req *GetReq, options ...core.RequestOptionFunc) (*GetResp, error) {
+// 创建知识库文档
+// https://open.dingtalk.com/document/development/create-team-space-document
+func (s *Service) CreateDoc(ctx context.Context, req *CreateDocReq, options ...core.RequestOptionFunc) (*CreateDocResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost
-	apiReq.ApiPath = s.config.OapiUrl + "/topapi/v2/user/get"
+	apiReq.ApiPath = "/v1.0/doc/workspaces/:workspaceId/docs"
 	apiReq.SupportedAccessTokenTypes = []core.AccessTokenType{
 		core.AccessTokenTypeApp,
 		core.AccessTokenTypeCorp,
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &GetResp{ApiResp: apiResp}
+	resp := &CreateDocResp{ApiResp: apiResp}
 	if err != nil {
 		return resp, err
 	}
@@ -36,22 +36,17 @@ func (s *Service) Get(ctx context.Context, req *GetReq, options ...core.RequestO
 	return resp, err
 }
 
-// 获取员工人数
-func (s *Service) Count(ctx context.Context, req *CountReq, options ...core.RequestOptionFunc) (*CountResp, error) {
+// 删除知识库文档
+// https://open.dingtalk.com/document/development/delete-team-space-documents
+func (s *Service) DeleteDoc(ctx context.Context, req *DeleteDocReq, options ...core.RequestOptionFunc) (*DeleteDocResp, error) {
 	apiReq := req.apiReq
-	apiReq.HttpMethod = http.MethodPost
-	apiReq.ApiPath = s.config.OapiUrl + "/topapi/user/count"
+	apiReq.HttpMethod = http.MethodDelete
+	apiReq.ApiPath = "/v1.0/doc/workspaces/:workspaceId/docs/:nodeId"
 	apiReq.SupportedAccessTokenTypes = []core.AccessTokenType{
 		core.AccessTokenTypeApp,
-		core.AccessTokenTypeCorp,
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &CountResp{ApiResp: apiResp}
-	if err != nil {
-		return resp, err
-	}
-
-	err = apiResp.UnmarshalBody(resp, s.config)
+	resp := &DeleteDocResp{ApiResp: apiResp}
 	return resp, err
 }

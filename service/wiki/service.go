@@ -1,4 +1,4 @@
-package v2
+package wiki
 
 import (
 	"context"
@@ -8,16 +8,28 @@ import (
 )
 
 type Service struct {
-	config *core.Config
+	Workspace *workspace
+	Node      *node
 }
 
 func NewService(config *core.Config) *Service {
-	return &Service{config}
+	return &Service{
+		Workspace: &workspace{config},
+		Node:      &node{config},
+	}
 }
 
-// POST 新建知识库
+type workspace struct {
+	config *core.Config
+}
+
+type node struct {
+	config *core.Config
+}
+
+// 新建知识库
 // https://open.dingtalk.com/document/development/new-knowledge-base
-func (s *Service) CreateWorkspace(ctx context.Context, req *CreateWorkspaceReq, options ...core.RequestOptionFunc) (*CreateWorkspaceResp, error) {
+func (s *workspace) Create(ctx context.Context, req *CreateWorkspaceReq, options ...core.RequestOptionFunc) (*CreateWorkspaceResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost
 	apiReq.ApiPath = "/v2.0/wiki/workspaces"
@@ -36,9 +48,9 @@ func (s *Service) CreateWorkspace(ctx context.Context, req *CreateWorkspaceReq, 
 	return resp, err
 }
 
-// GET 获取知识库
+// 获取知识库
 // https://open.dingtalk.com/document/development/obtain-the-knowledge-base
-func (s *Service) GetWorkspace(ctx context.Context, req *GetWorkspaceReq, options ...core.RequestOptionFunc) (*GetWorkspaceResp, error) {
+func (s *workspace) Get(ctx context.Context, req *GetWorkspaceReq, options ...core.RequestOptionFunc) (*GetWorkspaceResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodGet
 	apiReq.ApiPath = "/v2.0/wiki/workspaces/:workspaceId"
@@ -57,9 +69,9 @@ func (s *Service) GetWorkspace(ctx context.Context, req *GetWorkspaceReq, option
 	return resp, err
 }
 
-// GET 获取知识库列表
+// 获取知识库列表
 // https://open.dingtalk.com/document/development/get-knowledge-base-list
-func (s *Service) GetWorkspaces(ctx context.Context, req *GetWorkspacesReq, options ...core.RequestOptionFunc) (*GetWorkspacesResp, error) {
+func (s *workspace) List(ctx context.Context, req *ListWorkspaceReq, options ...core.RequestOptionFunc) (*ListWorkspaceResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodGet
 	apiReq.ApiPath = "/v2.0/wiki/workspaces"
@@ -69,7 +81,7 @@ func (s *Service) GetWorkspaces(ctx context.Context, req *GetWorkspacesReq, opti
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &GetWorkspacesResp{ApiResp: apiResp}
+	resp := &ListWorkspaceResp{ApiResp: apiResp}
 	if err != nil {
 		return resp, err
 	}
@@ -80,7 +92,7 @@ func (s *Service) GetWorkspaces(ctx context.Context, req *GetWorkspacesReq, opti
 
 // 获取我的文档知识库信息
 // https://open.dingtalk.com/document/development/get-my-documents
-func (s *Service) MineWorkspaces(ctx context.Context, req *MineWorkspacesReq, options ...core.RequestOptionFunc) (*MineWorkspacesResp, error) {
+func (s *workspace) Mine(ctx context.Context, req *MineWorkspaceReq, options ...core.RequestOptionFunc) (*MineWorkspaceResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodGet
 	apiReq.ApiPath = "/v2.0/wiki/mineWorkspaces"
@@ -90,7 +102,28 @@ func (s *Service) MineWorkspaces(ctx context.Context, req *MineWorkspacesReq, op
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &MineWorkspacesResp{ApiResp: apiResp}
+	resp := &MineWorkspaceResp{ApiResp: apiResp}
+	if err != nil {
+		return resp, err
+	}
+
+	err = apiResp.UnmarshalBody(resp, s.config)
+	return resp, err
+}
+
+// 获取节点
+// https://open.dingtalk.com/document/development/get-knowledge-base-acquisition-node
+func (s *node) Get(ctx context.Context, req *GetNodeReq, options ...core.RequestOptionFunc) (*GetNodeResp, error) {
+	apiReq := req.apiReq
+	apiReq.HttpMethod = http.MethodGet
+	apiReq.ApiPath = "/v2.0/wiki/nodes/:nodeId"
+	apiReq.SupportedAccessTokenTypes = []core.AccessTokenType{
+		core.AccessTokenTypeApp,
+		core.AccessTokenTypeCorp,
+	}
+
+	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
+	resp := &GetNodeResp{ApiResp: apiResp}
 	if err != nil {
 		return resp, err
 	}

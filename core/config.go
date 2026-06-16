@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	OapiUrl string
 	BaseUrl string // 服务地址
 
 	AppId       string // 第三方个人应用
