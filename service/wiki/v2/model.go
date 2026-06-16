@@ -34,7 +34,7 @@ type Workspace struct {
 }
 
 // CreateWorkspaceReq
-type CreateWorkspaceReq = Request
+type CreateWorkspaceReq Request
 type CreateWorkspaceReqBuilder struct {
 	apiReq *core.ApiReq
 }
@@ -67,7 +67,7 @@ type CreateWorkspaceResp struct {
 }
 
 // GetWorkspaceReq
-type GetWorkspaceReq = Request
+type GetWorkspaceReq Request
 
 type GetWorkspaceReqBuilder struct {
 	apiReq *core.ApiReq
@@ -103,7 +103,7 @@ type GetWorkspaceResp struct {
 }
 
 // GetWorkspacesReq
-type GetWorkspacesReq = Request
+type GetWorkspacesReq Request
 type GetWorkspacesReqBuilder struct {
 	apiReq *core.ApiReq
 }
@@ -149,7 +149,7 @@ type GetWorkspacesResp struct {
 }
 
 // MineWorkspaces
-type MineWorkspacesReq = Request
+type MineWorkspacesReq Request
 
 type MineWorkspacesReqBuilder struct {
 	apiReq *core.ApiReq
