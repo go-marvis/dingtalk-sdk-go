@@ -55,8 +55,8 @@ func (builder *CreateWorkspaceReqBuilder) Build() *CreateWorkspaceReq {
 type CreateWorkspaceReqBody struct {
 	Name   string `json:"name"`
 	Option struct {
-		Description string `json:"description"`
-		TeamId      string `json:"teamId"`
+		Description string `json:"description,omitempty"`
+		TeamId      string `json:"teamId,omitempty"`
 	} `json:"option"`
 }
 

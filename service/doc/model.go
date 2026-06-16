@@ -27,9 +27,9 @@ type CreateDocReqBody struct {
 	Name         string       `json:"name"`
 	DocType      DocType      `json:"docType"`
 	OperatorId   string       `json:"operatorId"`
-	ParentNodeId string       `json:"parentNodeId"`
-	TemplateId   string       `json:"templateId"`
-	TemplateType TemplateType `json:"templateType"`
+	ParentNodeId string       `json:"parentNodeId,omitempty"`
+	TemplateId   string       `json:"templateId,omitempty"`
+	TemplateType TemplateType `json:"templateType,omitempty"`
 }
 
 // CreateDocReq
