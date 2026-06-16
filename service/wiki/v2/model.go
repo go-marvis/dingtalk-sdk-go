@@ -6,6 +6,10 @@ import (
 	"github.com/go-marvis/dingtalk-sdk-go/core"
 )
 
+type Request struct {
+	apiReq *core.ApiReq
+}
+
 type Icon struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
@@ -29,7 +33,8 @@ type Workspace struct {
 	PermissionRole string `json:"permissionRole"`
 }
 
-// CreateWorkspaceReqBuilder
+// CreateWorkspaceReq
+type CreateWorkspaceReq = Request
 type CreateWorkspaceReqBuilder struct {
 	apiReq *core.ApiReq
 }
@@ -47,10 +52,6 @@ func (builder *CreateWorkspaceReqBuilder) Build() *CreateWorkspaceReq {
 	return &CreateWorkspaceReq{builder.apiReq}
 }
 
-type CreateWorkspaceReq struct {
-	apiReq *core.ApiReq
-}
-
 type CreateWorkspaceReqBody struct {
 	Name   string `json:"name"`
 	Option struct {
@@ -65,7 +66,44 @@ type CreateWorkspaceResp struct {
 	Workspace *Workspace `json:"workspace"`
 }
 
-// GetWorkspacesReqBuilder
+// GetWorkspaceReq
+type GetWorkspaceReq = Request
+
+type GetWorkspaceReqBuilder struct {
+	apiReq *core.ApiReq
+}
+
+func NewGetWorkspaceReqBuilder() *GetWorkspaceReqBuilder {
+	return &GetWorkspaceReqBuilder{core.NewApiReq()}
+}
+
+func (builder *GetWorkspaceReqBuilder) WorkspaceId(workspaceId string) *GetWorkspaceReqBuilder {
+	builder.apiReq.PathParams.Set("workspaceId", workspaceId)
+	return builder
+}
+
+func (builder *GetWorkspaceReqBuilder) WithPermissionRole(withPermissionRole bool) *GetWorkspaceReqBuilder {
+	builder.apiReq.QueryParams.Set("withPermissionRole", strconv.FormatBool(withPermissionRole))
+	return builder
+}
+
+func (builder *GetWorkspaceReqBuilder) OperatorId(operatorId string) *GetWorkspaceReqBuilder {
+	builder.apiReq.QueryParams.Set("operatorId", operatorId)
+	return builder
+}
+
+func (builder *GetWorkspaceReqBuilder) Build() *GetWorkspaceReq {
+	return &GetWorkspaceReq{builder.apiReq}
+}
+
+type GetWorkspaceResp struct {
+	*core.ApiResp
+	core.CodeError
+	Workspace *Workspace `json:"workspace"`
+}
+
+// GetWorkspacesReq
+type GetWorkspacesReq = Request
 type GetWorkspacesReqBuilder struct {
 	apiReq *core.ApiReq
 }
@@ -103,10 +141,6 @@ func (builder *GetWorkspacesReqBuilder) Build() *GetWorkspacesReq {
 	return &GetWorkspacesReq{builder.apiReq}
 }
 
-type GetWorkspacesReq struct {
-	apiReq *core.ApiReq
-}
-
 type GetWorkspacesResp struct {
 	*core.ApiResp
 	core.CodeError
@@ -114,39 +148,27 @@ type GetWorkspacesResp struct {
 	NextToken  string       `json:"next_token"`
 }
 
-// GetWorkspaceReqBuilder
-type GetWorkspaceReqBuilder struct {
+// MineWorkspaces
+type MineWorkspacesReq = Request
+
+type MineWorkspacesReqBuilder struct {
 	apiReq *core.ApiReq
 }
 
-func NewGetWorkspaceReqBuilder() *GetWorkspaceReqBuilder {
-	return &GetWorkspaceReqBuilder{core.NewApiReq()}
+func NewMineWorkspacesReqBuilder() *MineWorkspacesReqBuilder {
+	return &MineWorkspacesReqBuilder{core.NewApiReq()}
 }
 
-func (builder *GetWorkspaceReqBuilder) WorkspaceId(workspaceId string) *GetWorkspaceReqBuilder {
-	builder.apiReq.PathParams.Set("workspaceId", workspaceId)
-	return builder
-}
-
-func (builder *GetWorkspaceReqBuilder) WithPermissionRole(withPermissionRole bool) *GetWorkspaceReqBuilder {
-	builder.apiReq.QueryParams.Set("withPermissionRole", strconv.FormatBool(withPermissionRole))
-	return builder
-}
-
-func (builder *GetWorkspaceReqBuilder) OperatorId(operatorId string) *GetWorkspaceReqBuilder {
+func (builder *MineWorkspacesReqBuilder) OperatorId(operatorId string) *MineWorkspacesReqBuilder {
 	builder.apiReq.QueryParams.Set("operatorId", operatorId)
 	return builder
 }
 
-func (builder *GetWorkspaceReqBuilder) Build() *GetWorkspaceReq {
-	return &GetWorkspaceReq{builder.apiReq}
+func (builder *MineWorkspacesReqBuilder) Build() *MineWorkspacesReq {
+	return &MineWorkspacesReq{builder.apiReq}
 }
 
-type GetWorkspaceReq struct {
-	apiReq *core.ApiReq
-}
-
-type GetWorkspaceResp struct {
+type MineWorkspacesResp struct {
 	*core.ApiResp
 	core.CodeError
 	Workspace *Workspace `json:"workspace"`

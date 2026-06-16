@@ -36,6 +36,27 @@ func (s *Service) CreateWorkspace(ctx context.Context, req *CreateWorkspaceReq, 
 	return resp, err
 }
 
+// GET 获取知识库
+// https://open.dingtalk.com/document/development/obtain-the-knowledge-base
+func (s *Service) GetWorkspace(ctx context.Context, req *GetWorkspaceReq, options ...core.RequestOptionFunc) (*GetWorkspaceResp, error) {
+	apiReq := req.apiReq
+	apiReq.HttpMethod = http.MethodGet
+	apiReq.ApiPath = "/v2.0/wiki/workspaces/:workspaceId"
+	apiReq.SupportedAccessTokenTypes = []core.AccessTokenType{
+		core.AccessTokenTypeApp,
+		core.AccessTokenTypeCorp,
+	}
+
+	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
+	resp := &GetWorkspaceResp{ApiResp: apiResp}
+	if err != nil {
+		return resp, err
+	}
+
+	err = apiResp.UnmarshalBody(resp, s.config)
+	return resp, err
+}
+
 // GET 获取知识库列表
 // https://open.dingtalk.com/document/development/get-knowledge-base-list
 func (s *Service) GetWorkspaces(ctx context.Context, req *GetWorkspacesReq, options ...core.RequestOptionFunc) (*GetWorkspacesResp, error) {
@@ -57,19 +78,19 @@ func (s *Service) GetWorkspaces(ctx context.Context, req *GetWorkspacesReq, opti
 	return resp, err
 }
 
-// GET 获取知识库
-// https://open.dingtalk.com/document/development/obtain-the-knowledge-base
-func (s *Service) GetWorkspace(ctx context.Context, req *GetWorkspaceReq, options ...core.RequestOptionFunc) (*GetWorkspaceResp, error) {
+// 获取我的文档知识库信息
+// https://open.dingtalk.com/document/development/get-my-documents
+func (s *Service) MineWorkspaces(ctx context.Context, req *MineWorkspacesReq, options ...core.RequestOptionFunc) (*MineWorkspacesResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodGet
-	apiReq.ApiPath = "/v2.0/wiki/workspaces/:workspaceId"
+	apiReq.ApiPath = "/v2.0/wiki/mineWorkspaces"
 	apiReq.SupportedAccessTokenTypes = []core.AccessTokenType{
 		core.AccessTokenTypeApp,
 		core.AccessTokenTypeCorp,
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &GetWorkspaceResp{ApiResp: apiResp}
+	resp := &MineWorkspacesResp{ApiResp: apiResp}
 	if err != nil {
 		return resp, err
 	}
