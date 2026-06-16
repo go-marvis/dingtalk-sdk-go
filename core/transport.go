@@ -77,7 +77,9 @@ func readResponse(resp *http.Response) ([]byte, error) {
 }
 
 func Request(ctx context.Context, apiReq *ApiReq, config *Config, options ...RequestOptionFunc) (*ApiResp, error) {
-	option := &RequestOption{}
+	option := &RequestOption{
+		Header: http.Header{},
+	}
 	for _, fn := range options {
 		fn(option)
 	}
