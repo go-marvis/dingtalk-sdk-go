@@ -10,8 +10,8 @@ func NewGetReqBuilder() *GetSpacesReqBuilder {
 	return &GetSpacesReqBuilder{core.NewApiReq()}
 }
 
-func (builder *GetSpacesReqBuilder) Build() *GetSpaceReq {
-	return &GetSpaceReq{builder.apiReq}
+func (b *GetSpacesReqBuilder) Build() *GetSpaceReq {
+	return &GetSpaceReq{b.apiReq}
 }
 
 type GetSpaceReq struct {
