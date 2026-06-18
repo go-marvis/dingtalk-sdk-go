@@ -2,15 +2,14 @@ package topapi
 
 import (
 	"github.com/go-marvis/dingtalk-sdk-go/core"
-	"github.com/go-marvis/dingtalk-sdk-go/service/topapi/user"
 )
 
 type Service struct {
-	User *user.Service
+	User *user
 }
 
 func NewService(config *core.Config) *Service {
 	return &Service{
-		User: user.NewService(config),
+		User: &user{config},
 	}
 }

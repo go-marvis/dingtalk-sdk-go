@@ -1,4 +1,4 @@
-package user
+package topapi
 
 import (
 	"context"
@@ -7,17 +7,13 @@ import (
 	"github.com/go-marvis/dingtalk-sdk-go/core"
 )
 
-type Service struct {
+type user struct {
 	config *core.Config
-}
-
-func NewService(config *core.Config) *Service {
-	return &Service{config}
 }
 
 // 查询用户详情
 // https://open.dingtalk.com/document/development/query-user-details
-func (s *Service) Get(ctx context.Context, req *GetReq, options ...core.RequestOptionFunc) (*GetResp, error) {
+func (s *user) Get(ctx context.Context, req *GetUserReq, options ...core.RequestOptionFunc) (*GetUserResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost
 	apiReq.ApiPath = s.config.OapiUrl + "/topapi/v2/user/get"
@@ -27,7 +23,7 @@ func (s *Service) Get(ctx context.Context, req *GetReq, options ...core.RequestO
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &GetResp{ApiResp: apiResp}
+	resp := &GetUserResp{ApiResp: apiResp}
 	if err != nil {
 		return resp, err
 	}
@@ -37,7 +33,8 @@ func (s *Service) Get(ctx context.Context, req *GetReq, options ...core.RequestO
 }
 
 // 获取员工人数
-func (s *Service) Count(ctx context.Context, req *CountReq, options ...core.RequestOptionFunc) (*CountResp, error) {
+// https://open.dingtalk.com/document/development/user-management-acquires-number-employees
+func (s *user) Count(ctx context.Context, req *CountUserReq, options ...core.RequestOptionFunc) (*CountUserResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost
 	apiReq.ApiPath = s.config.OapiUrl + "/topapi/user/count"
@@ -47,7 +44,7 @@ func (s *Service) Count(ctx context.Context, req *CountReq, options ...core.Requ
 	}
 
 	apiResp, err := core.Request(ctx, apiReq, s.config, options...)
-	resp := &CountResp{ApiResp: apiResp}
+	resp := &CountUserResp{ApiResp: apiResp}
 	if err != nil {
 		return resp, err
 	}

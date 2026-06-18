@@ -1,21 +1,13 @@
-package user
+package topapi
 
 import "github.com/go-marvis/dingtalk-sdk-go/core"
 
-type Request struct {
-	apiReq *core.ApiReq
-}
-
-// GetReq
-type GetReq Request
-
+// GetUserReq
+type GetUserReq request
+type GetReqBuilder requestBuilder
 type GetReqBody struct {
 	Language string `json:"language"`
 	UserId   string `json:"userid"`
-}
-
-type GetReqBuilder struct {
-	apiReq *core.ApiReq
 }
 
 func NewGetReqBuilder() *GetReqBuilder {
@@ -27,11 +19,11 @@ func (builder *GetReqBuilder) Body(body *GetReqBody) *GetReqBuilder {
 	return builder
 }
 
-func (builder *GetReqBuilder) Build() *GetReq {
-	return &GetReq{builder.apiReq}
+func (builder *GetReqBuilder) Build() *GetUserReq {
+	return &GetUserReq{builder.apiReq}
 }
 
-type GetResp struct {
+type GetUserResp struct {
 	*core.ApiResp
 	core.CodeError
 	Result *GetRespResult `json:"result"`
@@ -57,15 +49,12 @@ type GetRespResult struct {
 	Boss          bool   `json:"boss"`
 }
 
-// CountReq
-type CountReq Request
+// CountUserReq
+type CountUserReq request
+type CountReqBodyBuilder requestBuilder
 
 type CountReqBody struct {
 	OnlyActive string `json:"only_active,omitempty"`
-}
-
-type CountReqBodyBuilder struct {
-	apiReq *core.ApiReq
 }
 
 func NewCountReqBodyBuilder() *CountReqBodyBuilder {
@@ -77,11 +66,11 @@ func (b *CountReqBodyBuilder) Body(body *CountReqBody) *CountReqBodyBuilder {
 	return b
 }
 
-func (b *CountReqBodyBuilder) Build() *CountReq {
-	return &CountReq{b.apiReq}
+func (b *CountReqBodyBuilder) Build() *CountUserReq {
+	return &CountUserReq{b.apiReq}
 }
 
-type CountResp struct {
+type CountUserResp struct {
 	*core.ApiResp
 	core.CodeError
 	Result *CountRespResult `json:"result"`
