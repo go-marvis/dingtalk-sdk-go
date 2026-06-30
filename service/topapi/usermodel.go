@@ -4,32 +4,32 @@ import "github.com/go-marvis/dingtalk-sdk-go/core"
 
 // GetUserReq
 type GetUserReq request
-type GetReqBuilder requestBuilder
-type GetReqBody struct {
+type GetUserReqBuilder requestBuilder
+type GetUserReqBody struct {
 	Language string `json:"language"`
 	UserId   string `json:"userid"`
 }
 
-func NewGetReqBuilder() *GetReqBuilder {
-	return &GetReqBuilder{core.NewApiReq()}
+func NewGetUserReqBuilder() *GetUserReqBuilder {
+	return &GetUserReqBuilder{core.NewApiReq()}
 }
 
-func (builder *GetReqBuilder) Body(body *GetReqBody) *GetReqBuilder {
+func (builder *GetUserReqBuilder) Body(body *GetUserReqBody) *GetUserReqBuilder {
 	builder.apiReq.Body = body
 	return builder
 }
 
-func (builder *GetReqBuilder) Build() *GetUserReq {
+func (builder *GetUserReqBuilder) Build() *GetUserReq {
 	return &GetUserReq{builder.apiReq}
 }
 
 type GetUserResp struct {
 	*core.ApiResp
 	core.CodeError
-	Result *GetRespResult `json:"result"`
+	Result *GetUserRespResult `json:"result"`
 }
 
-type GetRespResult struct {
+type GetUserRespResult struct {
 	UserId        string `json:"userid"`
 	UnionId       string `json:"unionid"`
 	Name          string `json:"name"`
@@ -51,31 +51,31 @@ type GetRespResult struct {
 
 // CountUserReq
 type CountUserReq request
-type CountReqBodyBuilder requestBuilder
+type CountUserReqBodyBuilder requestBuilder
 
-type CountReqBody struct {
+type CountUserReqBody struct {
 	OnlyActive string `json:"only_active,omitempty"`
 }
 
-func NewCountReqBodyBuilder() *CountReqBodyBuilder {
-	return &CountReqBodyBuilder{core.NewApiReq()}
+func NewCountUserReqBodyBuilder() *CountUserReqBodyBuilder {
+	return &CountUserReqBodyBuilder{core.NewApiReq()}
 }
 
-func (b *CountReqBodyBuilder) Body(body *CountReqBody) *CountReqBodyBuilder {
+func (b *CountUserReqBodyBuilder) Body(body *CountUserReqBody) *CountUserReqBodyBuilder {
 	b.apiReq.Body = body
 	return b
 }
 
-func (b *CountReqBodyBuilder) Build() *CountUserReq {
+func (b *CountUserReqBodyBuilder) Build() *CountUserReq {
 	return &CountUserReq{b.apiReq}
 }
 
 type CountUserResp struct {
 	*core.ApiResp
 	core.CodeError
-	Result *CountRespResult `json:"result"`
+	Result *CountUserRespResult `json:"result"`
 }
 
-type CountRespResult struct {
+type CountUserRespResult struct {
 	Count int64 `json:"count"`
 }
