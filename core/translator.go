@@ -18,46 +18,46 @@ import (
 type ReqTranslator struct {
 }
 
-func authorizationToRequest(req *ApiReq, option *RequestOption, token string) {
-	if strings.Index(req.ApiPath, OapiUrl) == 0 {
-		req.QueryParams.Set("access_token", token)
-	} else {
-		option.Header.Set("x-acs-dingtalk-access-token", token)
-	}
-}
-
 func (translator *ReqTranslator) translate(ctx context.Context, req *ApiReq, accessTokenType AccessTokenType, config *Config, option *RequestOption) (*http.Request, error) {
-	body := req.Body
-
-	if _, ok := body.(*Formdata); ok {
-		option.FileUpload = true
-	}
-
-	contentType, rawBody, err := translator.payload(body, config.Serializer)
-	if err != nil {
-		return nil, err
-	}
+	var (
+		accessToken string
+		err         error
+	)
 
 	switch accessTokenType {
 	case AccessTokenTypeApp:
-		accessToken := option.AppAccessToken
+		accessToken = option.AppAccessToken
 		if accessToken == "" {
 			accessToken, err = tokenManager.getAppAccessToken(ctx, config)
 			if err != nil {
 				return nil, err
 			}
 		}
-		authorizationToRequest(req, option, accessToken)
 
 	case AccessTokenTypeCorp:
-		accessToken := option.CorpAccessToken
+		accessToken = option.CorpAccessToken
 		if accessToken == "" {
 			accessToken, err = tokenManager.getCorpAccessToken(ctx, config)
 			if err != nil {
 				return nil, err
 			}
 		}
-		authorizationToRequest(req, option, accessToken)
+	}
+
+	if _, ok := req.Body.(*Formdata); ok {
+		option.FileUpload = true
+	}
+
+	// access token
+	if strings.Index(req.ApiPath, OapiUrl) == 0 || option.FileUpload {
+		req.QueryParams.Set("access_token", accessToken)
+	} else {
+		option.Header.Set("x-acs-dingtalk-access-token", accessToken)
+	}
+
+	contentType, rawBody, err := translator.payload(req.Body, config.Serializer)
+	if err != nil {
+		return nil, err
 	}
 
 	var pathSegs []string
