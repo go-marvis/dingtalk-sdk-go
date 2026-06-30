@@ -5,9 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -23,8 +27,12 @@ func authorizationToRequest(req *ApiReq, option *RequestOption, token string) {
 }
 
 func (translator *ReqTranslator) translate(ctx context.Context, req *ApiReq, accessTokenType AccessTokenType, config *Config, option *RequestOption) (*http.Request, error) {
-
 	body := req.Body
+
+	if _, ok := body.(*Formdata); ok {
+		option.FileUpload = true
+	}
+
 	contentType, rawBody, err := translator.payload(body, config.Serializer)
 	if err != nil {
 		return nil, err
@@ -105,11 +113,73 @@ func (translator *ReqTranslator) translate(ctx context.Context, req *ApiReq, acc
 }
 
 func (translator *ReqTranslator) payload(body interface{}, serializer Serializer) (string, []byte, error) {
+	if fd, ok := body.(*Formdata); ok {
+		return fd.content()
+	}
 	contentType := defaultContentType
 	if body == nil {
 		return contentType, nil, nil
 	}
 
-	data, err := serializer.Marshal(body)
-	return contentType, data, err
+	bs, err := serializer.Marshal(body)
+	return contentType, bs, err
+}
+
+type Formdata struct {
+	fields map[string]interface{}
+	data   *struct {
+		content     []byte
+		contentType string
+	}
+}
+
+func (fd *Formdata) AddField(field string, val interface{}) *Formdata {
+	if fd.fields == nil {
+		fd.fields = map[string]interface{}{}
+	}
+	fd.fields[field] = val
+	return fd
+}
+
+func (fd *Formdata) AddFile(field string, r io.Reader) *Formdata {
+	return fd.AddField(field, r)
+}
+
+func (fd *Formdata) content() (string, []byte, error) {
+	if fd.data != nil {
+		return fd.data.contentType, fd.data.content, nil
+	}
+	buf := &bytes.Buffer{}
+	writer := multipart.NewWriter(buf)
+	for key, val := range fd.fields {
+		if r, ok := val.(io.Reader); ok {
+			filename := "unknown-file"
+			if f, ok := val.(*os.File); ok {
+				filename = filepath.Base(f.Name())
+			}
+			part, err := writer.CreateFormFile(key, filename)
+			if err != nil {
+				return "", nil, err
+			}
+			_, err = io.Copy(part, r)
+			if err != nil {
+				return "", nil, err
+			}
+			continue
+		}
+		err := writer.WriteField(key, fmt.Sprint(val))
+		if err != nil {
+			return "", nil, err
+		}
+	}
+	contentType := writer.FormDataContentType()
+	err := writer.Close()
+	if err != nil {
+		return "", nil, err
+	}
+	fd.data = &struct {
+		content     []byte
+		contentType string
+	}{content: buf.Bytes(), contentType: contentType}
+	return fd.data.contentType, fd.data.content, nil
 }

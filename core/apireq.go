@@ -37,20 +37,33 @@ type RequestOption struct {
 	CorpAccessToken  string // 第三方应用授权企业
 	UserAccessToken  string // 第三方个人应用
 	SuiteAccessToken string // 第三方企业应用
-
-	Header http.Header
+	FileUpload       bool
+	FileDownload     bool
+	Header           http.Header
 }
 
 type RequestOptionFunc func(option *RequestOption)
 
-func WithHeader(header http.Header) RequestOptionFunc {
-	return func(option *RequestOption) {
-		option.Header = header
-	}
-}
-
 func WithAppAccessToken(accessToken string) RequestOptionFunc {
 	return func(option *RequestOption) {
 		option.AppAccessToken = accessToken
+	}
+}
+
+func WithFileUpload() RequestOptionFunc {
+	return func(option *RequestOption) {
+		option.FileUpload = true
+	}
+}
+
+func WithFileDownload() RequestOptionFunc {
+	return func(option *RequestOption) {
+		option.FileDownload = true
+	}
+}
+
+func WithHeader(header http.Header) RequestOptionFunc {
+	return func(option *RequestOption) {
+		option.Header = header
 	}
 }
