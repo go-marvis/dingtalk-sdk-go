@@ -11,6 +11,8 @@ type oto struct {
 	config *core.Config
 }
 
+// 批量发送人与机器人会话中机器人消息
+// https://open.dingtalk.com/document/development/chatbots-send-one-on-one-chat-messages-in-batches
 func (s *oto) BatchSend(ctx context.Context, req *BatchSendOTOReq, options ...core.RequestOptionFunc) (*BatchSendOTOResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost

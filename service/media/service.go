@@ -15,6 +15,8 @@ func NewService(config *core.Config) *Service {
 	return &Service{config}
 }
 
+// 上传媒体文件
+// https://open.dingtalk.com/document/development/upload-media-files
 func (s *Service) Upload(ctx context.Context, req *UploadReq, options ...core.RequestOptionFunc) (*UploadResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost

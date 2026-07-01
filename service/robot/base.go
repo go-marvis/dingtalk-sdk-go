@@ -48,7 +48,7 @@ type MsgAudio struct {
 
 type MsgFile struct {
 	MediaId  string `json:"mediaId"`
-	FileId   string `json:"fileId"`
+	FileName string `json:"fileName"`
 	FileType string `json:"fileType"`
 }
 
@@ -57,6 +57,8 @@ type MsgVideo struct {
 	VideoType    string `json:"videoType"`
 	PicMediaId   string `json:"picMediaId"`
 	Duration     string `json:"duration"`
+	Height       string `json:"height,omitempty"`
+	Width        string `json:"width,omitempty"`
 }
 
 type request struct {

@@ -11,6 +11,8 @@ type ding struct {
 	config *core.Config
 }
 
+// 发送DING消息
+// https://open.dingtalk.com/document/development/robot-sends-nail-message
 func (s *ding) Send(ctx context.Context, req *SendDingReq, options ...core.RequestOptionFunc) (*SendDingResp, error) {
 	apiReq := req.apiReq
 	apiReq.HttpMethod = http.MethodPost
